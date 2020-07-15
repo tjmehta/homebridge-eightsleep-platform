@@ -1,16 +1,16 @@
 {
   "private": true,
-  "displayName": "Plugin Name",
-  "name": "homebridge-plugin-name",
+  "displayName": "Eightsleep Platform",
+  "name": "homebridge-eightsleep-platform",
   "version": "1.0.0",
-  "description": "A short description about what your plugin does.",
-  "license": "Apache-2.0",
+  "description": "eightsleep platform plugin for homebridge",
+  "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git://github.com/USERNAME/GITHUB_PROJECT_NAME.git"
+    "url": "git://github.com/tjmehta/homebridge-eightsleep-platform.git"
   },
   "bugs": {
-    "url": "https://github.com/USERNAME/GITHUB_PROJECT_NAME/issues"
+    "url": "https://github.com/tjmehta/homebridge-eightsleep-platform/issues"
   },
   "engines": {
     "node": ">=10.17.0",
@@ -24,9 +24,15 @@
     "prepublishOnly": "npm run lint && npm run build"
   },
   "keywords": [
-    "homebridge-plugin"
+    "homebridge-plugin",
+    "eightsleep",
+    "pod",
+    "platform",
+    "bed"
   ],
-  "dependencies": {},
+  "dependencies": {
+    "eightsleep": "^1.2.2"
+  },
   "devDependencies": {
     "@types/node": "^14.0.11",
     "@typescript-eslint/eslint-plugin": "^3.1.0",
@@ -34,6 +40,7 @@
     "eslint": "^7.2.0",
     "homebridge": "^1.1.0",
     "nodemon": "^2.0.4",
+    "prettier": "^2.0.5",
     "rimraf": "^3.0.2",
     "ts-node": "^8.10.2",
     "typescript": "^3.9.5"
