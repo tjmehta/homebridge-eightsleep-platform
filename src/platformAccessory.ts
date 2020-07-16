@@ -1,4 +1,5 @@
 import {
+  CharacteristicGetCallback,
   CharacteristicSetCallback,
   CharacteristicValue,
   PlatformAccessory,
@@ -13,6 +14,7 @@ import { Levels } from 'eightsleep/dist/cjs/EightSleepAppApi'
 export { Levels, Sides } from 'eightsleep/dist/cjs/EightSleepAppApi'
 
 type RotationDirectionType = 0 | 1
+type PositiveLevelsType = 0 | 10 | 20 | 30 | 40 | 50 | 60 | 70 | 80 | 90 | 100
 
 /**
  * Platform Accessory
@@ -79,60 +81,84 @@ export class EightsleepPodPlatformAccessory {
       .on('set', this.setRotationSpeed)
   }
 
-  getOnState = async (): Promise<boolean> => {
-    return await this.eightSleepPod.isOn()
-  }
-
-  setOnState = (on: CharacteristicValue, cb: CharacteristicSetCallback) => {
-    this.platform.log.debug('Set On ->', on)
-    const side = this.accessory.context.side
-    if (on) {
-      this.eightSleepPod
-        .turnOn(side)
-        .then(() => cb())
-        .catch(cb)
-    } else {
-      this.eightSleepPod
-        .turnOff(side)
-        .then(() => cb())
-        .catch(cb)
+  getOnState = async (
+    cb: CharacteristicGetCallback<boolean>,
+  ): Promise<void> => {
+    try {
+      const on = await this.eightSleepPod.isOn()
+      cb(null, on)
+    } catch (err) {
+      cb(err)
     }
   }
 
-  getRotationDirection = async (): Promise<number> => {
-    const side = this.accessory.context.side
-    return await this.eightSleepPod.isOn(side).then((on) => {
-      return on
+  setOnState = async (
+    on: CharacteristicValue,
+    cb: CharacteristicSetCallback,
+  ) => {
+    try {
+      this.platform.log.debug('Set On ->', on)
+      const side = this.accessory.context.side
+      if (on) {
+        await this.eightSleepPod.turnOn(side)
+        cb(null, true)
+      } else {
+        await this.eightSleepPod.turnOff(side)
+        cb(null, false)
+      }
+    } catch (err) {
+      cb(err)
+    }
+  }
+
+  getRotationDirection = async (
+    cb: CharacteristicGetCallback<RotationDirectionType>,
+  ): Promise<void> => {
+    try {
+      const side = this.accessory.context.side
+      const on = await this.eightSleepPod.isOn(side)
+      const rotationDirection = on
         ? this.platform.Characteristic.RotationDirection.CLOCKWISE
         : this.platform.Characteristic.RotationDirection.COUNTER_CLOCKWISE
-    })
+      cb(null, rotationDirection)
+    } catch (err) {
+      cb(err)
+    }
   }
 
   setRotationDirection = async (
     rotationDirection: CharacteristicValue,
     cb: CharacteristicSetCallback,
   ) => {
-    const side = this.accessory.context.side
-    this.platform.log.debug('Set RotationDirection ->', rotationDirection)
-    this.rotationDirection = rotationDirection as RotationDirectionType
     try {
-      const level = await this.eightSleepPod.getLevel(side)
+      const side = this.accessory.context.side
+      this.platform.log.debug('Set RotationDirection ->', rotationDirection)
+      this.rotationDirection = rotationDirection as RotationDirectionType
+      let level: Levels = await this.eightSleepPod.getLevel(side)
       if (level === 0) {
+        cb(null, level)
         return
       }
       const factor = this.rotationDirection - 1
-      await this.eightSleepPod.setLevel(side, (level * factor) as Levels)
-      cb()
+      level = (level * factor) as Levels
+      await this.eightSleepPod.setLevel(side, level)
+      cb(null, level)
     } catch (err) {
       cb(err)
     }
   }
 
-  getRotationSpeed = async (): Promise<number> => {
-    const side = this.accessory.context.side
-    return await this.eightSleepPod.getLevel(side).then((level) => {
-      return level < 0 ? 0 - level : level
-    })
+  getRotationSpeed = async (
+    cb: CharacteristicGetCallback<PositiveLevelsType>,
+  ): Promise<void> => {
+    try {
+      const side = this.accessory.context.side
+      let level: Levels = await this.eightSleepPod.getLevel(side)
+      level = Math.abs(level) as PositiveLevelsType
+      cb(null, level)
+    } catch (err) {
+      cb(err)
+    }
   }
 
   setRotationSpeed = async (
@@ -142,10 +168,12 @@ export class EightsleepPodPlatformAccessory {
     const side = this.accessory.context.side
     this.platform.log.debug('Set RotationSpeed ->', rotationSpeed)
     try {
-      const level = Math.round((rotationSpeed as number) / 10) * 10
+      let level: Levels = (Math.round((rotationSpeed as number) / 10) *
+        10) as Levels
       const factor = this.rotationDirection - 1
-      await this.eightSleepPod.setLevel(side, (level * factor) as Levels)
-      cb()
+      level = (level * factor) as Levels
+      await this.eightSleepPod.setLevel(side, level)
+      cb(null, level)
     } catch (err) {
       cb(err)
     }
