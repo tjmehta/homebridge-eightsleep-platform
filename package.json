@@ -1,16 +1,16 @@
 {
   "private": true,
   "displayName": "Eightsleep Platform",
-  "name": "homebridge-eightsleep-platform",
+  "name": "homebridge-eightsleep-pod",
   "version": "1.0.0",
   "description": "eightsleep platform plugin for homebridge",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git://github.com/tjmehta/homebridge-eightsleep-platform.git"
+    "url": "git://github.com/tjmehta/homebridge-eightsleep-pod.git"
   },
   "bugs": {
-    "url": "https://github.com/tjmehta/homebridge-eightsleep-platform/issues"
+    "url": "https://github.com/tjmehta/homebridge-eightsleep-pod/issues"
   },
   "engines": {
     "node": ">=10.17.0",
