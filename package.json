@@ -1,5 +1,4 @@
 {
-  "private": true,
   "displayName": "Eightsleep Platform",
   "name": "homebridge-eightsleep-pod",
   "version": "1.0.0",
