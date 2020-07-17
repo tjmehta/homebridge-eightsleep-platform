@@ -18,11 +18,13 @@
       "single"
     ],
     "ban-ts-comment": {
-      "ts-expect-error": false,
-      "ts-ignore": false,
-      "ts-nocheck": false,
-      "ts-check": false,
-      "minimumDescriptionLength": 0
+      "error" {
+        "ts-expect-error": false,
+        "ts-ignore": false,
+        "ts-nocheck": false,
+        "ts-check": false,
+        "minimumDescriptionLength": 0
+      }
     },
     "linebreak-style": [
       "warn",
