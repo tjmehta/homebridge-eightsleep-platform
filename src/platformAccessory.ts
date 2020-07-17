@@ -8,7 +8,7 @@ import {
 
 import { DeviceType } from 'eightsleep/dist/cjs/validateDevice'
 import EightSleepPod from './EightSleepPod'
-import { EightsleepPodPlatformPlugin } from './platform'
+import { EightSleepPodPlatformPlugin } from './platform'
 import { Levels } from 'eightsleep/dist/cjs/EightSleepAppApi'
 
 export { Levels, Sides } from 'eightsleep/dist/cjs/EightSleepAppApi'
@@ -27,7 +27,7 @@ export class EightsleepPodPlatformAccessory {
   private rotationDirection: RotationDirectionType = 0
 
   constructor(
-    private readonly platform: EightsleepPodPlatformPlugin,
+    private readonly platform: EightSleepPodPlatformPlugin,
     private readonly accessory: PlatformAccessory,
   ) {
     const device: DeviceType = this.accessory.context.device

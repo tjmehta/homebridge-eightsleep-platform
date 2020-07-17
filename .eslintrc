@@ -17,6 +17,13 @@
       "warn",
       "single"
     ],
+    "ban-ts-comment": {
+      "ts-expect-error": false,
+      "ts-ignore": false,
+      "ts-nocheck": false,
+      "ts-check": false,
+      "minimumDescriptionLength": 0
+    },
     "linebreak-style": [
       "warn",
       "unix"

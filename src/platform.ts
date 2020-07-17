@@ -5,6 +5,7 @@ import {
   Logger,
   PlatformAccessory,
   PlatformConfig,
+  PlatformPluginConstructor,
   Service,
 } from 'homebridge'
 import { EightsleepPodPlatformAccessory, Sides } from './platformAccessory'
@@ -13,7 +14,7 @@ import { PLATFORM_NAME, PLUGIN_NAME } from './settings'
 import { DeviceType } from 'eightsleep/dist/cjs/validateDevice'
 import EightSleep from 'eightsleep'
 
-export interface EightsleepPodPlatformPluginConfig extends PlatformConfig {
+export interface EightSleepPodPlatformPluginConfig extends PlatformConfig {
   email: string
   password: string
 }
@@ -23,7 +24,9 @@ export interface EightsleepPodPlatformPluginConfig extends PlatformConfig {
  * This class is the main constructor for your plugin, this is where you should
  * parse the user config and discover/register accessories with Homebridge.
  */
-export class EightsleepPodPlatformPlugin implements DynamicPlatformPlugin {
+// @ts-ignore
+export class EightSleepPodPlatformPlugin
+  implements DynamicPlatformPlugin, PlatformPluginConstructor {
   public readonly Service: typeof Service = this.api.hap.Service
   public readonly Characteristic: typeof Characteristic = this.api.hap
     .Characteristic
@@ -34,7 +37,7 @@ export class EightsleepPodPlatformPlugin implements DynamicPlatformPlugin {
 
   constructor(
     public readonly log: Logger,
-    public readonly config: EightsleepPodPlatformPluginConfig,
+    public readonly config: EightSleepPodPlatformPluginConfig,
     public readonly api: API,
   ) {
     this.log.debug('Finished initializing platform:', this.config.name)
