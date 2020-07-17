@@ -18,7 +18,7 @@
       "single"
     ],
     "ban-ts-comment": {
-      "error" {
+      "error": {
         "ts-expect-error": false,
         "ts-ignore": false,
         "ts-nocheck": false,
