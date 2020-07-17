@@ -17,15 +17,7 @@
       "warn",
       "single"
     ],
-    "ban-ts-comment": {
-      "error": {
-        "ts-expect-error": false,
-        "ts-ignore": false,
-        "ts-nocheck": false,
-        "ts-check": false,
-        "minimumDescriptionLength": 0
-      }
-    },
+    "@typescript-eslint/ban-ts-comment": 0,
     "linebreak-style": [
       "warn",
       "unix"
