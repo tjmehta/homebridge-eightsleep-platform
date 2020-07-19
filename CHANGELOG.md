@@ -1,3 +1,7 @@
+# v2.0.0
+
+- major: implement as homekit heatercooler
+
 # v1.0.10
 
 - patch: fix set/getRotationDirection and setRotationSpeed

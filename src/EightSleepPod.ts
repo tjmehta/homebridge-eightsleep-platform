@@ -56,4 +56,9 @@ export default class EightSleepPod {
       .getAppApiClient()
       .setDeviceSideLevel(this.deviceId, side, level)
   }
+
+  async getTemperature() {
+    // const f = this.clientApi.json('/v2')
+    // return ((f - 32) * 5) / 9
+  }
 }

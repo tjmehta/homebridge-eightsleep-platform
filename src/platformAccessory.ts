@@ -14,7 +14,15 @@ import { Levels } from 'eightsleep/dist/cjs/EightSleepAppApi'
 
 export { Levels, Sides } from 'eightsleep/dist/cjs/EightSleepAppApi'
 
-type RotationDirectionType = 0 | 1
+const INACTIVE = 0
+const IDLE = 1
+const HEATING = 2
+const COOLING = 3
+type CurrentHeaterCoolerStateType = 0 | 1 | 2 | 3
+const AUTO = 0
+const HEAT = 1
+const COOL = 2
+type TargetHeaterCoolerStateType = 0 | 1 | 2
 type PositiveLevelsType = 0 | 10 | 20 | 30 | 40 | 50 | 60 | 70 | 80 | 90 | 100
 
 const CLOCKWISE = 1
@@ -28,7 +36,7 @@ const COUNTER_CLOCKWISE = 0
 export class EightsleepPodPlatformAccessory {
   private service: Service
   private eightSleepPod: EightSleepPod
-  private rotationDirection: RotationDirectionType = CLOCKWISE
+  private targetHeatCool: 1 | 2 = HEAT
 
   constructor(
     private readonly platform: EightSleepPodPlatformPlugin,
@@ -60,11 +68,11 @@ export class EightsleepPodPlatformAccessory {
         device.sensorInfo?.serialNumber || 'unknown',
       )
 
-    // see https://developers.homebridge.io/#/service/Fan
+    // see https://developers.homebridge.io/#/service/HeaterCooler
 
     this.service =
-      this.accessory.getService(this.platform.Service.Fan) ||
-      this.accessory.addService(this.platform.Service.Fan)
+      this.accessory.getService(this.platform.Service.HeaterCooler) ||
+      this.accessory.addService(this.platform.Service.HeaterCooler)
 
     // required Characteristics
     this.service.setCharacteristic(
@@ -72,109 +80,147 @@ export class EightsleepPodPlatformAccessory {
       accessory.context.displayName,
     )
     this.service
-      .getCharacteristic(this.platform.Characteristic.On)
-      .on('get', this.getOnState)
-      .on('set', this.setOnState)
+      .getCharacteristic(this.platform.Characteristic.Active)
+      .on('get', this.getActiveState)
+      .on('set', this.setActiveState)
+    this.service
+      .getCharacteristic(this.platform.Characteristic.CurrentHeaterCoolerState)
+      .on('get', this.getCurrentHeaterCoolerState)
+    this.service
+      .getCharacteristic(this.platform.Characteristic.TargetHeaterCoolerState)
+      .on('get', this.getTargetHeaterCoolerState)
+      .on('set', this.setTargetHeaterCoolerState)
 
     // optional Characteristics
-    this.service
-      .getCharacteristic(this.platform.Characteristic.RotationDirection)
-      .on('get', this.getRotationDirection)
-      .on('set', this.setRotationDirection)
-
     this.service
       .getCharacteristic(this.platform.Characteristic.RotationSpeed)
       .on('get', this.getRotationSpeed)
       .on('set', this.setRotationSpeed)
   }
 
-  getOnState = async (
-    cb: CharacteristicGetCallback<boolean>,
+  getActiveState = async (
+    cb: CharacteristicGetCallback<number>,
   ): Promise<void> => {
     try {
-      this.platform.log.info('Get On')
+      this.platform.log.info('Get Active')
       const side = this.accessory.context.side
       const on = await this.eightSleepPod.isOn(side)
-      this.platform.log.info('Get On ->', on)
-      cb(null, on)
+      this.platform.log.info('Get Active ->', on)
+      cb(null, on ? 1 : 0)
     } catch (err) {
-      this.platform.log.error('Get On Error ->', err)
+      this.platform.log.error('Get Active Error ->', err)
       cb(err)
     }
   }
 
-  setOnState = async (
-    on: CharacteristicValue,
+  setActiveState = async (
+    active: CharacteristicValue,
     cb: CharacteristicSetCallback,
   ) => {
     try {
-      this.platform.log.info('Set On', on)
+      this.platform.log.info('Set Active', active)
       const side = this.accessory.context.side
-      if (on) {
-        this.platform.log.info('Set On ->', on)
+      if (active) {
+        this.platform.log.info('Set Active ->', active)
         await this.eightSleepPod.turnOn(side)
-        cb(null, true)
+        cb(null, 1)
       } else {
-        this.platform.log.info('Set On ->', on)
+        this.platform.log.info('Set Active ->', active)
         await this.eightSleepPod.turnOff(side)
-        cb(null, false)
+        cb(null, 0)
       }
     } catch (err) {
-      this.platform.log.error('Set On Error ->', err)
+      this.platform.log.error('Set Active Error ->', err)
       cb(err)
     }
   }
 
-  getRotationDirection = async (
-    cb: CharacteristicGetCallback<RotationDirectionType>,
+  getCurrentHeaterCoolerState = async (
+    cb: CharacteristicGetCallback<number>,
   ): Promise<void> => {
     try {
-      this.platform.log.info('Get RotationDirection')
+      this.platform.log.info('Get CurrentHeaterCoolerState')
       const side = this.accessory.context.side
-      let rotationDirection
-      const level = await this.eightSleepPod.getLevel(side)
-      if (level < 0) {
-        rotationDirection = COUNTER_CLOCKWISE
-      } else if (level > 0) {
-        rotationDirection = CLOCKWISE
-      } else {
-        rotationDirection = this.rotationDirection ?? CLOCKWISE
+      const status = await this.eightSleepPod.getStatus(side)
+      if (status.currentActivity === 'off') {
+        this.platform.log.info('Get CurrentHeaterCoolerState ->', INACTIVE)
+        cb(null, INACTIVE)
+        return
       }
-      // cache it
-      this.rotationDirection = rotationDirection
-      this.platform.log.info('Get RotationDirection ->', this.rotationDirection)
-      cb(null, this.rotationDirection)
+      if (status.currentTargetLevel === 0) {
+        this.platform.log.info('Get CurrentHeaterCoolerState ->', IDLE)
+        cb(null, IDLE)
+      } else if (status.currentTargetLevel > 0) {
+        this.platform.log.info('Get CurrentHeaterCoolerState ->', HEATING)
+        cb(null, HEATING)
+      } else {
+        this.platform.log.info('Get CurrentHeaterCoolerState ->', COOLING)
+        cb(null, COOLING)
+      }
     } catch (err) {
-      this.platform.log.error('Get RotationDirection Error ->', err)
+      this.platform.log.error('Get CurrentHeaterCoolerState Error ->', err)
       cb(err)
     }
   }
 
-  setRotationDirection = async (
-    rotationDirection: CharacteristicValue,
+  getTargetHeaterCoolerState = async (
+    cb: CharacteristicGetCallback<TargetHeaterCoolerStateType>,
+  ): Promise<void> => {
+    try {
+      this.platform.log.info('Get TargetHeaterCoolerState')
+      const side = this.accessory.context.side
+      const status = await this.eightSleepPod.getStatus(side)
+      if (status.currentActivity === 'off') {
+        this.platform.log.info('Get TargetHeaterCoolerState ->', AUTO)
+        cb(null, AUTO)
+        return
+      }
+      if (status.currentTargetLevel > 0) {
+        this.targetHeatCool = HEAT
+      } else if (status.currentTargetLevel < 0) {
+        this.targetHeatCool = COOL
+      }
+      this.platform.log.info(
+        'Get TargetHeaterCoolerState ->',
+        this.targetHeatCool,
+      )
+      cb(null, this.targetHeatCool)
+    } catch (err) {
+      this.platform.log.error('Get TargetHeaterCoolerState Error ->', err)
+      cb(err)
+    }
+  }
+
+  setTargetHeaterCoolerState = async (
+    state: CharacteristicValue,
     cb: CharacteristicSetCallback,
   ) => {
     try {
-      this.platform.log.info('Set RotationSpeed', rotationDirection)
+      this.platform.log.info('Set TargetHeaterCoolerState', state)
       const side = this.accessory.context.side
-      let level: Levels = await this.eightSleepPod.getLevel(side)
+      const level: Levels = await this.eightSleepPod.getLevel(side)
+      if (state !== AUTO) {
+        // ignore auto for now..
+        this.targetHeatCool = state as 1 | 2
+      }
       if (level === 0) {
-        this.rotationDirection = rotationDirection as RotationDirectionType
-        cb(null, this.rotationDirection)
+        cb(null, this.targetHeatCool)
         return
       }
-      const factor = rotationDirection === CLOCKWISE ? 1 : -1
-      level = (level * factor) as Levels
+      const factor = this.targetHeatCool === HEAT ? 1 : -1
+      const nextLevel = (level * factor) as Levels
       this.platform.log.info(
-        'Set RotationDirection ->',
-        rotationDirection,
+        'Set TargetHeaterCoolerState ->',
+        state,
+        this.targetHeatCool,
         level,
       )
-      await this.eightSleepPod.setLevel(side, level)
-      this.rotationDirection = rotationDirection as RotationDirectionType
-      cb(null, this.rotationDirection)
+      if (level !== nextLevel) {
+        await this.eightSleepPod.setLevel(side, nextLevel)
+      }
+      cb(null, this.targetHeatCool)
     } catch (err) {
-      this.platform.log.error('Set RotationDirection Error ->', err)
+      this.platform.log.error('Set TargetHeaterCoolerState Error ->', err)
       cb(err)
     }
   }
@@ -204,7 +250,7 @@ export class EightsleepPodPlatformAccessory {
       const side = this.accessory.context.side
       let level: Levels = (Math.round((rotationSpeed as number) / 10) *
         10) as Levels
-      const factor = this.rotationDirection === CLOCKWISE ? 1 : -1
+      const factor = this.targetHeatCool === HEAT ? 1 : -1
       level = (level * factor) as Levels
       this.platform.log.info('Set RotationSpeed ->', rotationSpeed, level)
       await this.eightSleepPod.setLevel(side, level)
