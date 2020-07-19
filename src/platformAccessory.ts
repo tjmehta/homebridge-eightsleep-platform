@@ -25,9 +25,6 @@ const COOL = 2
 type TargetHeaterCoolerStateType = 0 | 1 | 2
 type PositiveLevelsType = 0 | 10 | 20 | 30 | 40 | 50 | 60 | 70 | 80 | 90 | 100
 
-const CLOCKWISE = 1
-const COUNTER_CLOCKWISE = 0
-
 /**
  * Platform Accessory
  * An instance of this class is created for each accessory your platform registers
@@ -90,6 +87,9 @@ export class EightsleepPodPlatformAccessory {
       .getCharacteristic(this.platform.Characteristic.TargetHeaterCoolerState)
       .on('get', this.getTargetHeaterCoolerState)
       .on('set', this.setTargetHeaterCoolerState)
+    this.service
+      .getCharacteristic(this.platform.Characteristic.CurrentTemperature)
+      .on('get', this.getRotationSpeed)
 
     // optional Characteristics
     this.service

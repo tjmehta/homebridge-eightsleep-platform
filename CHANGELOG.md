@@ -1,3 +1,7 @@
+# v2.0.1
+
+- patch: current temp shows level
+
 # v2.0.0
 
 - major: implement as homekit heatercooler
