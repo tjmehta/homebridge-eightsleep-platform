@@ -1,3 +1,7 @@
+# v2.0.5
+
+- patch: getCurrentHeaterCoolerState logging
+
 # v2.0.4
 
 - patch: fix missing set setTargetHeaterCoolerState

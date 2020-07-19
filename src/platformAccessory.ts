@@ -145,13 +145,25 @@ export class EightsleepPodPlatformAccessory {
         return
       }
       if (status.currentTargetLevel === 0) {
-        this.platform.log.info('Get CurrentHeaterCoolerState ->', IDLE)
+        this.platform.log.info(
+          'Get CurrentHeaterCoolerState ->',
+          status.currentTargetLevel,
+          IDLE,
+        )
         cb(null, IDLE)
       } else if (status.currentTargetLevel > 0) {
-        this.platform.log.info('Get CurrentHeaterCoolerState ->', HEATING)
+        this.platform.log.info(
+          'Get CurrentHeaterCoolerState ->',
+          status.currentTargetLevel,
+          HEATING,
+        )
         cb(null, HEATING)
       } else {
-        this.platform.log.info('Get CurrentHeaterCoolerState ->', COOLING)
+        this.platform.log.info(
+          'Get CurrentHeaterCoolerState ->',
+          status.currentTargetLevel,
+          COOLING,
+        )
         cb(null, COOLING)
       }
     } catch (err) {
@@ -213,7 +225,7 @@ export class EightsleepPodPlatformAccessory {
         'Set TargetHeaterCoolerState ->',
         state,
         targetHeatCool,
-        level,
+        nextLevel,
       )
       if (level !== nextLevel) {
         await this.eightSleepPod.setLevel(side, nextLevel)
