@@ -90,11 +90,13 @@ export class EightsleepPodPlatformAccessory {
     cb: CharacteristicGetCallback<boolean>,
   ): Promise<void> => {
     try {
+      this.platform.log.info('Get On')
       const side = this.accessory.context.side
       const on = await this.eightSleepPod.isOn(side)
       this.platform.log.info('Get On ->', on)
       cb(null, on)
     } catch (err) {
+      this.platform.log.error('Get On Error ->', err)
       cb(err)
     }
   }
@@ -104,16 +106,19 @@ export class EightsleepPodPlatformAccessory {
     cb: CharacteristicSetCallback,
   ) => {
     try {
-      this.platform.log.info('Set On ->', on)
+      this.platform.log.info('Set On', on)
       const side = this.accessory.context.side
       if (on) {
+        this.platform.log.info('Set On ->', on)
         await this.eightSleepPod.turnOn(side)
         cb(null, true)
       } else {
+        this.platform.log.info('Set On ->', on)
         await this.eightSleepPod.turnOff(side)
         cb(null, false)
       }
     } catch (err) {
+      this.platform.log.error('Set On Error ->', err)
       cb(err)
     }
   }
@@ -122,6 +127,7 @@ export class EightsleepPodPlatformAccessory {
     cb: CharacteristicGetCallback<RotationDirectionType>,
   ): Promise<void> => {
     try {
+      this.platform.log.info('Get RotationDirection')
       const side = this.accessory.context.side
       const on = await this.eightSleepPod.isOn(side)
       let rotationDirection
@@ -143,6 +149,7 @@ export class EightsleepPodPlatformAccessory {
       this.platform.log.info('Get RotationDirection ->', this.rotationDirection)
       cb(null, this.rotationDirection)
     } catch (err) {
+      this.platform.log.error('Get RotationDirection Error ->', err)
       cb(err)
     }
   }
@@ -152,6 +159,7 @@ export class EightsleepPodPlatformAccessory {
     cb: CharacteristicSetCallback,
   ) => {
     try {
+      this.platform.log.info('Set RotationSpeed', rotationDirection)
       const side = this.accessory.context.side
       this.rotationDirection = rotationDirection as RotationDirectionType
       let level: Levels = await this.eightSleepPod.getLevel(side)
@@ -173,6 +181,7 @@ export class EightsleepPodPlatformAccessory {
       await this.eightSleepPod.setLevel(side, level)
       cb(null, level)
     } catch (err) {
+      this.platform.log.error('Set RotationDirection Error ->', err)
       cb(err)
     }
   }
@@ -181,12 +190,14 @@ export class EightsleepPodPlatformAccessory {
     cb: CharacteristicGetCallback<PositiveLevelsType>,
   ): Promise<void> => {
     try {
+      this.platform.log.info('Get RotationSpeed')
       const side = this.accessory.context.side
       let level: Levels = await this.eightSleepPod.getLevel(side)
       level = Math.abs(level) as PositiveLevelsType
       this.platform.log.info('Get RotationSpeed ->', level)
       cb(null, level)
     } catch (err) {
+      this.platform.log.error('Get RotationSpeed Error ->', err)
       cb(err)
     }
   }
@@ -195,8 +206,9 @@ export class EightsleepPodPlatformAccessory {
     rotationSpeed: CharacteristicValue,
     cb: CharacteristicSetCallback,
   ) => {
-    const side = this.accessory.context.side
     try {
+      this.platform.log.info('Set RotationSpeed', rotationSpeed)
+      const side = this.accessory.context.side
       let level: Levels = (Math.round((rotationSpeed as number) / 10) *
         10) as Levels
       const factor =
@@ -205,9 +217,11 @@ export class EightsleepPodPlatformAccessory {
           ? 1
           : -1
       level = (level * factor) as Levels
+      this.platform.log.info('Set RotationSpeed ->', rotationSpeed, level)
       await this.eightSleepPod.setLevel(side, level)
       cb(null, level)
     } catch (err) {
+      this.platform.log.error('Set RotationSpeed Error ->', err)
       cb(err)
     }
   }

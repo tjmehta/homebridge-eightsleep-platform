@@ -1,3 +1,7 @@
+# v1.0.7
+
+- patch: improved error logs
+
 # v1.0.6
 
 - patch: fix clockwise = positive temp, counter-clockwise = negative temp

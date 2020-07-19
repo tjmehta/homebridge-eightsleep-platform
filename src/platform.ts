@@ -41,11 +41,27 @@ export class EightSleepPodPlatformPlugin
     public readonly api: API,
   ) {
     this.log.debug('Initializing platform:', this.config.name)
-    this.clientApi = new EightSleep({
-      email: this.config.email,
-      password: this.config.password,
-      oauthClient: this.config.oauthClient,
-    })
+    if (this.accessories.length) {
+      const clientApiJSON = this.accessories[0].context.clientApiJSON
+      if (
+        this.config.email === clientApiJSON.email &&
+        this.config.password === clientApiJSON.password &&
+        (!this.config.oauthClient?.id ||
+          this.config.oauthClient.id === clientApiJSON.oauthClient?.id) &&
+        (!this.config.oauthClient?.secret ||
+          this.config.oauthClient.secret === clientApiJSON.oauthClient?.secret)
+      ) {
+        this.clientApi = new EightSleep(clientApiJSON)
+      }
+    }
+    this.clientApi =
+      // @ts-ignore
+      this.clientApi ||
+      new EightSleep({
+        email: this.config.email,
+        password: this.config.password,
+        oauthClient: this.config.oauthClient,
+      })
 
     // When this event is fired it means Homebridge has restored all cached accessories from disk.
     // Dynamic Platform plugins should only register new accessories after this event was fired,
