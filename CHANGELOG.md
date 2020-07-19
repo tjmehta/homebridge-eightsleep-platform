@@ -1,3 +1,7 @@
+# v1.0.2
+
+- patch: fix context must be json
+
 # v1.0.1
 
 - patch: fix initial device query

@@ -7,6 +7,7 @@ import {
 } from 'homebridge'
 
 import { DeviceType } from 'eightsleep/dist/cjs/validateDevice'
+import EightSleep from 'eightsleep'
 import EightSleepPod from './EightSleepPod'
 import { EightSleepPodPlatformPlugin } from './platform'
 import { Levels } from 'eightsleep/dist/cjs/EightSleepAppApi'
@@ -31,7 +32,7 @@ export class EightsleepPodPlatformAccessory {
     private readonly accessory: PlatformAccessory,
   ) {
     const device: DeviceType = this.accessory.context.device
-    const clientApi = accessory.context.clientApi
+    const clientApi = new EightSleep(accessory.context.clientApiJSON)
     this.eightSleepPod = new EightSleepPod({
       clientApi,
       deviceId: device.deviceId as string,
