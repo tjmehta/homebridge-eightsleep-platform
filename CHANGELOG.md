@@ -1,5 +1,11 @@
 # v2.0.1
 
+- patch: target temp shows level
+- patch: temp display units
+- patch: remove current temp
+
+# v2.0.1
+
 - patch: current temp shows level
 
 # v2.0.0

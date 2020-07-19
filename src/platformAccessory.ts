@@ -88,8 +88,11 @@ export class EightsleepPodPlatformAccessory {
       .on('get', this.getTargetHeaterCoolerState)
       .on('set', this.setTargetHeaterCoolerState)
     this.service
-      .getCharacteristic(this.platform.Characteristic.CurrentTemperature)
+      .getCharacteristic(this.platform.Characteristic.TargetTemperature)
       .on('get', this.getRotationSpeed)
+    this.service
+      .getCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits)
+      .on('get', (cb) => cb(null, 0))
 
     // optional Characteristics
     this.service
