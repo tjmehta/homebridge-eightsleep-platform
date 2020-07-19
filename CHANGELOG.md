@@ -1,3 +1,9 @@
+# v1.0.6
+
+- patch: fix clockwise = positive temp, counter-clockwise = negative temp
+- patch: fix setRotationDirection and getRotationDirection
+- patch: improved logs
+
 # v1.0.5
 
 - patch: fix getOnState and getRotationDirection
