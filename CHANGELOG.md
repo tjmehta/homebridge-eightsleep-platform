@@ -1,3 +1,7 @@
+# v1.0.3
+
+- patch: clientApiJSON typo in context
+
 # v1.0.2
 
 - patch: fix context must be json

@@ -118,7 +118,7 @@ export class EightSleepPodPlatformPlugin
           this.log.info('Restoring existing accessory from cache:', displayName)
 
           // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
-          existingAccessory.context.apiClientJSON = this.clientApi.toJSON()
+          existingAccessory.context.clientApiJSON = this.clientApi.toJSON()
           existingAccessory.context.device = device
           existingAccessory.context.displayName = displayName
           existingAccessory.context.side = side
@@ -143,7 +143,7 @@ export class EightSleepPodPlatformPlugin
 
         // store a copy of the device object in the `accessory.context`
         // the `context` property can be used to store any data about the accessory you may need
-        accessory.context.apiClientJSON = this.clientApi.toJSON()
+        accessory.context.clientApiJSON = this.clientApi.toJSON()
         accessory.context.device = device
         accessory.context.displayName = displayName
         accessory.context.side = side
