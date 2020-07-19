@@ -1,5 +1,9 @@
 # v2.1.1
 
+- minor: fix get current query
+
+# v2.1.1
+
 - minor: fix get current temp
 
 # v2.1.0
