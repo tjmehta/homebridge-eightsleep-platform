@@ -1,3 +1,8 @@
+# v1.0.5
+
+- patch: fix getOnState and getRotationDirection
+- patch: convert more logs from debug to info
+
 # v1.0.4
 
 - patch: logs from debug to info

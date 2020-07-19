@@ -89,7 +89,9 @@ export class EightsleepPodPlatformAccessory {
     cb: CharacteristicGetCallback<boolean>,
   ): Promise<void> => {
     try {
-      const on = await this.eightSleepPod.isOn()
+      const side = this.accessory.context.side
+      const on = await this.eightSleepPod.isOn(side)
+      this.platform.log.info('Get On ->', on)
       cb(null, on)
     } catch (err) {
       cb(err)
@@ -101,7 +103,7 @@ export class EightsleepPodPlatformAccessory {
     cb: CharacteristicSetCallback,
   ) => {
     try {
-      this.platform.log.debug('Set On ->', on)
+      this.platform.log.info('Set On ->', on)
       const side = this.accessory.context.side
       if (on) {
         await this.eightSleepPod.turnOn(side)
@@ -121,10 +123,19 @@ export class EightsleepPodPlatformAccessory {
     try {
       const side = this.accessory.context.side
       const on = await this.eightSleepPod.isOn(side)
-      const rotationDirection = on
-        ? this.platform.Characteristic.RotationDirection.CLOCKWISE
-        : this.platform.Characteristic.RotationDirection.COUNTER_CLOCKWISE
-      cb(null, rotationDirection)
+      if (on) {
+        const level = await this.eightSleepPod.getLevel(side)
+        if (level < 0) {
+          this.rotationDirection = this.platform.Characteristic.RotationDirection.COUNTER_CLOCKWISE
+        }
+        if (level > 0) {
+          this.rotationDirection = this.platform.Characteristic.RotationDirection.CLOCKWISE
+        }
+      }
+      this.rotationDirection =
+        this.rotationDirection ||
+        this.platform.Characteristic.RotationDirection.CLOCKWISE
+      cb(null, this.rotationDirection)
     } catch (err) {
       cb(err)
     }
@@ -136,7 +147,7 @@ export class EightsleepPodPlatformAccessory {
   ) => {
     try {
       const side = this.accessory.context.side
-      this.platform.log.debug('Set RotationDirection ->', rotationDirection)
+      this.platform.log.info('Set RotationDirection ->', rotationDirection)
       this.rotationDirection = rotationDirection as RotationDirectionType
       let level: Levels = await this.eightSleepPod.getLevel(side)
       if (level === 0) {
@@ -159,6 +170,7 @@ export class EightsleepPodPlatformAccessory {
       const side = this.accessory.context.side
       let level: Levels = await this.eightSleepPod.getLevel(side)
       level = Math.abs(level) as PositiveLevelsType
+      this.platform.log.info('Get RotationSpeed ->', level)
       cb(null, level)
     } catch (err) {
       cb(err)
@@ -170,7 +182,7 @@ export class EightsleepPodPlatformAccessory {
     cb: CharacteristicSetCallback,
   ) => {
     const side = this.accessory.context.side
-    this.platform.log.debug('Set RotationSpeed ->', rotationSpeed)
+    this.platform.log.info('Set RotationSpeed ->', rotationSpeed)
     try {
       let level: Levels = (Math.round((rotationSpeed as number) / 10) *
         10) as Levels

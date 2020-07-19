@@ -40,7 +40,7 @@ export class EightSleepPodPlatformPlugin
     public readonly config: EightSleepPodPlatformPluginConfig,
     public readonly api: API,
   ) {
-    this.log.debug('Finished initializing platform:', this.config.name)
+    this.log.debug('Initializing platform:', this.config.name)
     this.clientApi = new EightSleep({
       email: this.config.email,
       password: this.config.password,
