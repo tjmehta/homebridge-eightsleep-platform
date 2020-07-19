@@ -89,7 +89,7 @@ export class EightsleepPodPlatformAccessory {
       .on('set', this.setTargetHeaterCoolerState)
     this.service
       .getCharacteristic(this.platform.Characteristic.CurrentTemperature)
-      .on('get', () => this.eightSleepPod.getTemperature())
+      .on('get', this.getCurrentTemperature())
 
     // optional Characteristics
     this.service
@@ -273,6 +273,20 @@ export class EightsleepPodPlatformAccessory {
       cb(null, Math.abs(level))
     } catch (err) {
       this.platform.log.error('Set RotationSpeed Error ->', err)
+      cb(err)
+    }
+  }
+
+  getCurrentTemperature = async (
+    cb: CharacteristicGetCallback<number>,
+  ): Promise<void> => {
+    try {
+      this.platform.log.info('Get CurrentTemperature')
+      const temp: number = await this.eightSleepPod.getTemperature()
+      this.platform.log.info('Get CurrentTemperature ->', temp)
+      cb(null, temp)
+    } catch (err) {
+      this.platform.log.error('Get CurrentTemperature Error ->', err)
       cb(err)
     }
   }

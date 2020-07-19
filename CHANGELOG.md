@@ -1,3 +1,7 @@
+# v2.1.3
+
+- minor: get current temp logs
+
 # v2.1.2
 
 - minor: fix get current query
