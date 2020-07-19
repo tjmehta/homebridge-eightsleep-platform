@@ -60,9 +60,12 @@ export default class EightSleepPod {
   async getTemperature() {
     const json: {
       metrics?: { roomTemperature?: { timeseries?: Array<{ value: number }> } }
-    } = await this.clientApi.json(
-      `v1/devices/${this.deviceId}/metrics/ambient?granularity=minute&from=2020-07-17T11:06:01.453Z&scope=humidity&scope=roomTemperature`,
-    )
+    } = await this.clientApi
+      .getAppApiClient()
+      .json(
+        `v1/devices/${this.deviceId}/metrics/ambient?granularity=minute&from=2020-07-17T11:06:01.453Z&scope=humidity&scope=roomTemperature`,
+        200,
+      )
     const timeseries = json.metrics?.roomTemperature?.timeseries
     if (timeseries?.length) {
       return timeseries[timeseries.length - 1].value || 0

@@ -1,3 +1,7 @@
+# v2.1.1
+
+- minor: fix get current temp
+
 # v2.1.0
 
 - minor: get current temp
