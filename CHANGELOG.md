@@ -1,3 +1,7 @@
+# v1.0.10
+
+- patch: fix set/getRotationDirection and setRotationSpeed
+
 # v1.0.9
 
 - patch: simplify getRotationDirection

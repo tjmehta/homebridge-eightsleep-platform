@@ -17,6 +17,9 @@ export { Levels, Sides } from 'eightsleep/dist/cjs/EightSleepAppApi'
 type RotationDirectionType = 0 | 1
 type PositiveLevelsType = 0 | 10 | 20 | 30 | 40 | 50 | 60 | 70 | 80 | 90 | 100
 
+const CLOCKWISE = 1
+const COUNTER_CLOCKWISE = 0
+
 /**
  * Platform Accessory
  * An instance of this class is created for each accessory your platform registers
@@ -25,8 +28,7 @@ type PositiveLevelsType = 0 | 10 | 20 | 30 | 40 | 50 | 60 | 70 | 80 | 90 | 100
 export class EightsleepPodPlatformAccessory {
   private service: Service
   private eightSleepPod: EightSleepPod
-  private rotationDirection: RotationDirectionType = this.platform
-    .Characteristic.RotationDirection.CLOCKWISE
+  private rotationDirection: RotationDirectionType = CLOCKWISE
 
   constructor(
     private readonly platform: EightSleepPodPlatformPlugin,
@@ -132,18 +134,14 @@ export class EightsleepPodPlatformAccessory {
       let rotationDirection
       const level = await this.eightSleepPod.getLevel(side)
       if (level < 0) {
-        rotationDirection = this.platform.Characteristic.RotationDirection
-          .COUNTER_CLOCKWISE
+        rotationDirection = COUNTER_CLOCKWISE
       } else if (level > 0) {
-        rotationDirection = this.platform.Characteristic.RotationDirection
-          .CLOCKWISE
+        rotationDirection = CLOCKWISE
       } else {
-        rotationDirection = this.rotationDirection
+        rotationDirection = this.rotationDirection ?? CLOCKWISE
       }
       // cache it
-      this.rotationDirection =
-        rotationDirection ??
-        this.platform.Characteristic.RotationDirection.CLOCKWISE
+      this.rotationDirection = rotationDirection
       this.platform.log.info('Get RotationDirection ->', this.rotationDirection)
       cb(null, this.rotationDirection)
     } catch (err) {
@@ -159,17 +157,13 @@ export class EightsleepPodPlatformAccessory {
     try {
       this.platform.log.info('Set RotationSpeed', rotationDirection)
       const side = this.accessory.context.side
-      this.rotationDirection = rotationDirection as RotationDirectionType
       let level: Levels = await this.eightSleepPod.getLevel(side)
       if (level === 0) {
-        cb(null, level)
+        this.rotationDirection = rotationDirection as RotationDirectionType
+        cb(null, this.rotationDirection)
         return
       }
-      const factor =
-        this.rotationDirection ===
-        this.platform.Characteristic.RotationDirection.CLOCKWISE
-          ? 1
-          : -1
+      const factor = rotationDirection === CLOCKWISE ? 1 : -1
       level = (level * factor) as Levels
       this.platform.log.info(
         'Set RotationDirection ->',
@@ -177,7 +171,8 @@ export class EightsleepPodPlatformAccessory {
         level,
       )
       await this.eightSleepPod.setLevel(side, level)
-      cb(null, level)
+      this.rotationDirection = rotationDirection as RotationDirectionType
+      cb(null, this.rotationDirection)
     } catch (err) {
       this.platform.log.error('Set RotationDirection Error ->', err)
       cb(err)
@@ -209,15 +204,11 @@ export class EightsleepPodPlatformAccessory {
       const side = this.accessory.context.side
       let level: Levels = (Math.round((rotationSpeed as number) / 10) *
         10) as Levels
-      const factor =
-        this.rotationDirection ===
-        this.platform.Characteristic.RotationDirection.CLOCKWISE
-          ? 1
-          : -1
+      const factor = this.rotationDirection === CLOCKWISE ? 1 : -1
       level = (level * factor) as Levels
       this.platform.log.info('Set RotationSpeed ->', rotationSpeed, level)
       await this.eightSleepPod.setLevel(side, level)
-      cb(null, level)
+      cb(null, Math.abs(level))
     } catch (err) {
       this.platform.log.error('Set RotationSpeed Error ->', err)
       cb(err)
