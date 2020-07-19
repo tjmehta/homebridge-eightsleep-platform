@@ -1,5 +1,9 @@
 # v2.0.1
 
+- patch: improve setTargetHeaterCoolerState
+
+# v2.0.2
+
 - patch: target temp shows level
 - patch: temp display units
 - patch: remove current temp

@@ -87,12 +87,6 @@ export class EightsleepPodPlatformAccessory {
       .getCharacteristic(this.platform.Characteristic.TargetHeaterCoolerState)
       .on('get', this.getTargetHeaterCoolerState)
       .on('set', this.setTargetHeaterCoolerState)
-    this.service
-      .getCharacteristic(this.platform.Characteristic.TargetTemperature)
-      .on('get', this.getRotationSpeed)
-    this.service
-      .getCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits)
-      .on('get', (cb) => cb(null, 0))
 
     // optional Characteristics
     this.service
@@ -202,26 +196,29 @@ export class EightsleepPodPlatformAccessory {
       this.platform.log.info('Set TargetHeaterCoolerState', state)
       const side = this.accessory.context.side
       const level: Levels = await this.eightSleepPod.getLevel(side)
-      if (state !== AUTO) {
-        // ignore auto for now..
-        this.targetHeatCool = state as 1 | 2
-      }
-      if (level === 0) {
+      if (state === AUTO) {
+        // ignore auto for now.. maybe make it revert to schedule?
         cb(null, this.targetHeatCool)
         return
       }
-      const factor = this.targetHeatCool === HEAT ? 1 : -1
+      const targetHeatCool = state as 1 | 2
+      if (level === 0) {
+        this.targetHeatCool = targetHeatCool
+        cb(null, targetHeatCool)
+        return
+      }
+      const factor = targetHeatCool === HEAT ? 1 : -1
       const nextLevel = (level * factor) as Levels
       this.platform.log.info(
         'Set TargetHeaterCoolerState ->',
         state,
-        this.targetHeatCool,
+        targetHeatCool,
         level,
       )
       if (level !== nextLevel) {
         await this.eightSleepPod.setLevel(side, nextLevel)
       }
-      cb(null, this.targetHeatCool)
+      cb(null, targetHeatCool)
     } catch (err) {
       this.platform.log.error('Set TargetHeaterCoolerState Error ->', err)
       cb(err)
