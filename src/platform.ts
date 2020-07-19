@@ -78,11 +78,7 @@ export class EightSleepPodPlatformPlugin
     await this.clientApi.login()
     const me = await this.clientApi.getMe()
     const devices: Array<DeviceType> = await Promise.all(
-      me.devices.map((id) =>
-        this.clientApi.getDevice(id, {
-          filter: ['deviceId', 'leftUserId', 'rightUserId'],
-        }),
-      ),
+      me.devices.map((id) => this.clientApi.getDevice(id)),
     )
     const allAccessoryIds = new Set<string>()
     devices.forEach((device) => {
