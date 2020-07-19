@@ -1,3 +1,7 @@
+# v2.0.4
+
+- patch: fix missing set setTargetHeaterCoolerState
+
 # v2.0.3
 
 - patch: improve setTargetHeaterCoolerState

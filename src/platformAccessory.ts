@@ -218,6 +218,7 @@ export class EightsleepPodPlatformAccessory {
       if (level !== nextLevel) {
         await this.eightSleepPod.setLevel(side, nextLevel)
       }
+      this.targetHeatCool = targetHeatCool
       cb(null, targetHeatCool)
     } catch (err) {
       this.platform.log.error('Set TargetHeaterCoolerState Error ->', err)
