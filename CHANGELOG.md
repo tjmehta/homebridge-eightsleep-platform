@@ -1,3 +1,7 @@
+# v2.1.0
+
+- minor: get current temp
+
 # v2.0.5
 
 - patch: getCurrentHeaterCoolerState logging
