@@ -1,3 +1,7 @@
+# v1.0.8
+
+- patch: eightsleep@v1.3.1
+
 # v1.0.7
 
 - patch: improved error logs
