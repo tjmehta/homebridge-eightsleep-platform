@@ -1,3 +1,7 @@
+# v1.0.4
+
+- patch: logs from debug to info
+
 # v1.0.3
 
 - patch: clientApiJSON typo in context

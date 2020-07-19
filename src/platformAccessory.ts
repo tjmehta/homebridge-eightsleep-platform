@@ -32,7 +32,10 @@ export class EightsleepPodPlatformAccessory {
     private readonly accessory: PlatformAccessory,
   ) {
     const device: DeviceType = this.accessory.context.device
-    const clientApi = new EightSleep(accessory.context.clientApiJSON)
+    const clientApi = new EightSleep(
+      this.accessory.context.clientApiJSON ||
+        this.accessory.context.apiClientJSON,
+    )
     this.eightSleepPod = new EightSleepPod({
       clientApi,
       deviceId: device.deviceId as string,
