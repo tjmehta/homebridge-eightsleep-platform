@@ -1,3 +1,7 @@
+# v1.0.9
+
+- patch: simplify getRotationDirection
+
 # v1.0.8
 
 - patch: eightsleep@v1.3.1

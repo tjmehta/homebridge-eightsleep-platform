@@ -129,18 +129,16 @@ export class EightsleepPodPlatformAccessory {
     try {
       this.platform.log.info('Get RotationDirection')
       const side = this.accessory.context.side
-      const on = await this.eightSleepPod.isOn(side)
       let rotationDirection
-      if (on) {
-        const level = await this.eightSleepPod.getLevel(side)
-        if (level < 0) {
-          rotationDirection = this.platform.Characteristic.RotationDirection
-            .COUNTER_CLOCKWISE
-        }
-        if (level > 0) {
-          rotationDirection = this.platform.Characteristic.RotationDirection
-            .CLOCKWISE
-        }
+      const level = await this.eightSleepPod.getLevel(side)
+      if (level < 0) {
+        rotationDirection = this.platform.Characteristic.RotationDirection
+          .COUNTER_CLOCKWISE
+      } else if (level > 0) {
+        rotationDirection = this.platform.Characteristic.RotationDirection
+          .CLOCKWISE
+      } else {
+        rotationDirection = this.rotationDirection
       }
       // cache it
       this.rotationDirection =
