@@ -1,3 +1,7 @@
+# v2.2.0
+
+- minor: add caching to api requests
+
 # v2.1.3
 
 - minor: get current temp logs
