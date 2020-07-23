@@ -1,3 +1,7 @@
+# v2.2.1
+
+- patch: improve getStatus and getTemperature caching
+
 # v2.2.0
 
 - minor: add caching to api requests
