@@ -40,16 +40,18 @@ export default class EightSleepPod {
     this.setOnOffCache = new MapWithClear()
   }
 
-  getStatus = memoConcurrent(async (side: Sides = Sides.SOLO) => {
-    const deviceStatus = await this.clientApi
-      .getAppApiClient()
-      .getDeviceStatus(this.deviceId)
+  getDeviceStatus = memoConcurrent(() =>
+    this.clientApi.getAppApiClient().getDeviceStatus(this.deviceId),
+  )
+
+  getStatus = async (side: Sides = Sides.SOLO) => {
+    const deviceStatus = await this.getDeviceStatus()
     const sideStatus = deviceStatus[side] as SideStatusType | undefined
     if (!sideStatus) {
       throw new BaseError('invalid deviceStatus', { deviceStatus, side })
     }
     return sideStatus
-  })
+  }
 
   turnOn = memoConcurrent(
     async (side: Sides = Sides.SOLO) => {
@@ -130,26 +132,33 @@ export default class EightSleepPod {
     },
   )
 
-  getTemperature = memoConcurrent(async () => {
-    const hourAgo: Date = (() => {
-      const d = new Date()
-      d.setHours(d.getHours() - 1)
-      return d
-    })()
-    const json: {
-      metrics?: { roomTemperature?: { timeseries?: Array<{ value: number }> } }
-    } = await this.clientApi
-      .getAppApiClient()
-      .json(
-        `v1/devices/${
-          this.deviceId
-        }/metrics/ambient?granularity=minute&from=${hourAgo.toISOString()}&scope=humidity&scope=roomTemperature`,
-        200,
-      )
-    const timeseries = json.metrics?.roomTemperature?.timeseries
-    if (timeseries?.length) {
-      return timeseries[timeseries.length - 1].value || 0
-    }
-    return 0
-  })
+  getTemperature = memoConcurrent(
+    async () => {
+      const hourAgo: Date = (() => {
+        const d = new Date()
+        d.setHours(d.getHours() - 1)
+        return d
+      })()
+      const json: {
+        metrics?: {
+          roomTemperature?: { timeseries?: Array<{ value: number }> }
+        }
+      } = await this.clientApi
+        .getAppApiClient()
+        .json(
+          `v1/devices/${
+            this.deviceId
+          }/metrics/ambient?granularity=minute&from=${hourAgo.toISOString()}&scope=humidity&scope=roomTemperature`,
+          200,
+        )
+      const timeseries = json.metrics?.roomTemperature?.timeseries
+      if (timeseries?.length) {
+        return timeseries[timeseries.length - 1].value || 0
+      }
+      return 0
+    },
+    {
+      maxAge: 3600,
+    },
+  )
 }
