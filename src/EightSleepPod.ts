@@ -1,24 +1,46 @@
+import {
+  DeviceStatusType,
+  SideStatusType,
+} from 'eightsleep/dist/cjs/validateDeviceStatus'
 import { Levels, Sides } from 'eightsleep/dist/cjs/EightSleepAppApi'
 
 import BaseError from 'baseerr'
 import EightSleep from 'eightsleep'
-import { SideStatusType } from 'eightsleep/dist/cjs/validateDeviceStatus'
+import memoConcurrent from 'memoize-concurrent'
 
 export type OptsType = {
   clientApi: EightSleep
   deviceId: string
 }
 
+class MapWithClear<K, V> extends Map<K, V> {
+  async clear() {
+    Array.from(this.keys()).forEach((key) => this.delete(key))
+  }
+}
+
 export default class EightSleepPod {
   private readonly clientApi: EightSleep
   private readonly deviceId: string
 
+  private readonly setLevelCache: MapWithClear<
+    string,
+    { data: Promise<DeviceStatusType>; maxAge: number }
+  >
+
+  private readonly setOnOffCache: MapWithClear<
+    string,
+    { data: Promise<DeviceStatusType>; maxAge: number }
+  >
+
   constructor({ clientApi, deviceId }: OptsType) {
     this.clientApi = clientApi
     this.deviceId = deviceId
+    this.setLevelCache = new MapWithClear()
+    this.setOnOffCache = new MapWithClear()
   }
 
-  async getStatus(side: Sides = Sides.SOLO) {
+  getStatus = memoConcurrent(async (side: Sides = Sides.SOLO) => {
     const deviceStatus = await this.clientApi
       .getAppApiClient()
       .getDeviceStatus(this.deviceId)
@@ -27,19 +49,53 @@ export default class EightSleepPod {
       throw new BaseError('invalid deviceStatus', { deviceStatus, side })
     }
     return sideStatus
-  }
+  })
 
-  async turnOn(side: Sides = Sides.SOLO) {
-    return await this.clientApi
-      .getAppApiClient()
-      .setDeviceSideOn(this.deviceId, side)
-  }
+  turnOn = memoConcurrent(
+    async (side: Sides = Sides.SOLO) => {
+      return await this.clientApi
+        .getAppApiClient()
+        .setDeviceSideOn(this.deviceId, side)
+    },
+    {
+      cacheKey: (args) => {
+        const cache = this.setOnOffCache
+        const key = (args[0] || Sides.SOLO) as string
+        const cached:
+          | { data: Promise<DeviceStatusType>; maxAge: number }
+          | undefined = cache.get(key)
+        cache.clear()
+        if (cached != null) {
+          cache.set(key, cached)
+        }
+        return key
+      },
+      cache: this.setOnOffCache,
+    },
+  )
 
-  async turnOff(side: Sides = Sides.SOLO) {
-    return await this.clientApi
-      .getAppApiClient()
-      .setDeviceSideOff(this.deviceId, side)
-  }
+  turnOff = memoConcurrent(
+    async (side: Sides = Sides.SOLO) => {
+      return await this.clientApi
+        .getAppApiClient()
+        .setDeviceSideOff(this.deviceId, side)
+    },
+    {
+      cacheKey: (args) => {
+        const cache = this.setOnOffCache
+        const key = (args[0] || Sides.SOLO) as string
+        const cached:
+          | { data: Promise<DeviceStatusType>; maxAge: number }
+          | undefined = cache.get(key)
+        cache.clear()
+        if (cached != null) {
+          cache.set(key, cached)
+        }
+        return key
+      },
+      cache: this.setOnOffCache,
+    },
+  )
 
   async isOn(side: Sides = Sides.SOLO): Promise<boolean> {
     const sideStatus = await this.getStatus(side)
@@ -51,13 +107,30 @@ export default class EightSleepPod {
     return sideStatus.currentTargetLevel || 0
   }
 
-  async setLevel(side: Sides = Sides.SOLO, level: Levels) {
-    return await this.clientApi
-      .getAppApiClient()
-      .setDeviceSideLevel(this.deviceId, side, level)
-  }
+  setLevel = memoConcurrent(
+    async (side: Sides = Sides.SOLO, level: Levels) => {
+      return await this.clientApi
+        .getAppApiClient()
+        .setDeviceSideLevel(this.deviceId, side, level)
+    },
+    {
+      cacheKey: ([side, level]) => {
+        const cache = this.setLevelCache
+        const key = `${side || Sides.SOLO}::${level}`
+        const cached:
+          | { data: Promise<DeviceStatusType>; maxAge: number }
+          | undefined = cache.get(key)
+        cache.clear()
+        if (cached != null) {
+          cache.set(key, cached)
+        }
+        return key
+      },
+      cache: this.setLevelCache,
+    },
+  )
 
-  async getTemperature() {
+  getTemperature = memoConcurrent(async () => {
     const hourAgo: Date = (() => {
       const d = new Date()
       d.setHours(d.getHours() - 1)
@@ -78,5 +151,5 @@ export default class EightSleepPod {
       return timeseries[timeseries.length - 1].value || 0
     }
     return 0
-  }
+  })
 }

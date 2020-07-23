@@ -18,6 +18,7 @@
       "single"
     ],
     "@typescript-eslint/ban-ts-comment": 0,
+    "@typescript-eslint/no-explicit-any": 0,
     "linebreak-style": [
       "warn",
       "unix"
@@ -31,7 +32,7 @@
       "always-multiline"
     ],
     "dot-notation": "off",
-    "eqeqeq": "warn",
+    "eqeqeq": "off",
     "curly": [
       "warn",
       "all"
