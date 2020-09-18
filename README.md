@@ -10,7 +10,7 @@ npm i --save homebridge-eightsleep-pod
 
 # Usage
 
-Example config, It will show up as a fan in homekit. Rsotation direction controls heating/cooling and fan speed controls the temperature level.
+Example config, It will show up as a Heater/Cooler in homekit. Fan speed controls the temperature level.
 
 ```
 "platforms": [
@@ -27,6 +27,11 @@ Example config, It will show up as a fan in homekit. Rsotation direction control
     // End of the config
   ],
 ```
+
+# Screenshots
+
+![tiles](https://i.imgur.com/cFjwXci.png)
+![controls](https://i.imgur.com/zL8bB8W.png)
 
 # License
 
