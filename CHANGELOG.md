@@ -1,3 +1,7 @@
+# v2.2.2
+
+- patch: update eightsleep@v1.3.2
+
 # v2.2.1
 
 - patch: improve getStatus and getTemperature caching
