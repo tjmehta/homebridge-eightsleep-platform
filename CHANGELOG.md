@@ -1,3 +1,7 @@
+# v2.3.1
+
+- minor: update eightsleep@v1.4.1
+
 # v2.3.0
 
 - minor: update eightsleep@v1.4.0
