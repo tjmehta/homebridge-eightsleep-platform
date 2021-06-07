@@ -56,7 +56,7 @@ export class EightSleepPodPlatformPlugin
     }
     this.clientApi =
       // @ts-ignore
-      this.clientApi ||
+      this.clientApi ??
       new EightSleep({
         email: this.config.email,
         password: this.config.password,

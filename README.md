@@ -19,10 +19,6 @@ Example config, It will show up as a Heater/Cooler in homekit. Fan speed control
       "platform": "EightSleepPod",
       "email": "email@email.com",
       "password": "mypassword",
-      "oauthClient": {
-        id: 'clientid....',
-        secret: 'clientsecret....'
-      }
     }
     // End of the config
   ],
