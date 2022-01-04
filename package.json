@@ -30,7 +30,7 @@
     "bed"
   ],
   "dependencies": {
-    "eightsleep": "^1.4.1",
+    "eightsleep": "^1.5.1",
     "memoize-concurrent": "^1.2.2",
     "mimic-fn": "^3.0.0"
   },
