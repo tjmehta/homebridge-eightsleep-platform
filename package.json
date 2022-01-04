@@ -17,6 +17,7 @@
   },
   "main": "dist/index.js",
   "scripts": {
+    "test": "npm run lint",
     "lint": "eslint src/**.ts",
     "watch": "npm run build && npm link && nodemon",
     "build": "rimraf ./dist && tsc",
