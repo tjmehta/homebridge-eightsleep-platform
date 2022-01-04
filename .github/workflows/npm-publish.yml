@@ -1,5 +1,8 @@
 name: Publish package to npm
-on: push
+on:
+  push:
+    tags:
+      - '**'
 jobs:
   build:
     runs-on: ubuntu-latest
