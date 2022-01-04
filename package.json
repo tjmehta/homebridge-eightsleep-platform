@@ -1,7 +1,7 @@
 {
   "displayName": "Eightsleep Platform",
   "name": "homebridge-eightsleep-pod",
-  "version": "2.3.1",
+  "version": "2.4.0",
   "description": "eightsleep platform plugin for homebridge",
   "license": "MIT",
   "repository": {
