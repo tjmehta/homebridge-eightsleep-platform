@@ -102,10 +102,10 @@ export class EightsleepPodPlatformAccessory {
     cb: CharacteristicGetCallback<number>,
   ): Promise<void> => {
     try {
-      this.platform.log.info('Get Active')
+      this.platform.log.debug('Get Active')
       const side = this.accessory.context.side
       const on = await this.eightSleepPod.isOn(side)
-      this.platform.log.info('Get Active ->', on)
+      this.platform.log.debug('Get Active ->', on)
       cb(null, on ? 1 : 0)
     } catch (err) {
       this.platform.log.error('Get Active Error ->', err)
@@ -118,14 +118,14 @@ export class EightsleepPodPlatformAccessory {
     cb: CharacteristicSetCallback,
   ) => {
     try {
-      this.platform.log.info('Set Active', active)
+      this.platform.log.debug('Set Active', active)
       const side = this.accessory.context.side
       if (active) {
-        this.platform.log.info('Set Active ->', active)
+        this.platform.log.debug('Set Active ->', active)
         await this.eightSleepPod.turnOn(side)
         cb(null, 1)
       } else {
-        this.platform.log.info('Set Active ->', active)
+        this.platform.log.debug('Set Active ->', active)
         await this.eightSleepPod.turnOff(side)
         cb(null, 0)
       }
@@ -139,30 +139,30 @@ export class EightsleepPodPlatformAccessory {
     cb: CharacteristicGetCallback<number>,
   ): Promise<void> => {
     try {
-      this.platform.log.info('Get CurrentHeaterCoolerState')
+      this.platform.log.debug('Get CurrentHeaterCoolerState')
       const side = this.accessory.context.side
       const status = await this.eightSleepPod.getStatus(side)
       if (status.currentActivity === 'off') {
-        this.platform.log.info('Get CurrentHeaterCoolerState ->', INACTIVE)
+        this.platform.log.debug('Get CurrentHeaterCoolerState ->', INACTIVE)
         cb(null, INACTIVE)
         return
       }
       if (status.currentTargetLevel === 0) {
-        this.platform.log.info(
+        this.platform.log.debug(
           'Get CurrentHeaterCoolerState ->',
           status.currentTargetLevel,
           IDLE,
         )
         cb(null, IDLE)
       } else if (status.currentTargetLevel > 0) {
-        this.platform.log.info(
+        this.platform.log.debug(
           'Get CurrentHeaterCoolerState ->',
           status.currentTargetLevel,
           HEATING,
         )
         cb(null, HEATING)
       } else {
-        this.platform.log.info(
+        this.platform.log.debug(
           'Get CurrentHeaterCoolerState ->',
           status.currentTargetLevel,
           COOLING,
@@ -179,11 +179,11 @@ export class EightsleepPodPlatformAccessory {
     cb: CharacteristicGetCallback<TargetHeaterCoolerStateType>,
   ): Promise<void> => {
     try {
-      this.platform.log.info('Get TargetHeaterCoolerState')
+      this.platform.log.debug('Get TargetHeaterCoolerState')
       const side = this.accessory.context.side
       const status = await this.eightSleepPod.getStatus(side)
       if (status.currentActivity === 'off') {
-        this.platform.log.info('Get TargetHeaterCoolerState ->', AUTO)
+        this.platform.log.debug('Get TargetHeaterCoolerState ->', AUTO)
         cb(null, AUTO)
         return
       }
@@ -192,7 +192,7 @@ export class EightsleepPodPlatformAccessory {
       } else if (status.currentTargetLevel < 0) {
         this.targetHeatCool = COOL
       }
-      this.platform.log.info(
+      this.platform.log.debug(
         'Get TargetHeaterCoolerState ->',
         this.targetHeatCool,
       )
@@ -208,7 +208,7 @@ export class EightsleepPodPlatformAccessory {
     cb: CharacteristicSetCallback,
   ) => {
     try {
-      this.platform.log.info('Set TargetHeaterCoolerState', state)
+      this.platform.log.debug('Set TargetHeaterCoolerState', state)
       const side = this.accessory.context.side
       const level: Levels = await this.eightSleepPod.getLevel(side)
       if (state === AUTO) {
@@ -224,7 +224,7 @@ export class EightsleepPodPlatformAccessory {
       }
       const factor = targetHeatCool === HEAT ? 1 : -1
       const nextLevel = (level * factor) as Levels
-      this.platform.log.info(
+      this.platform.log.debug(
         'Set TargetHeaterCoolerState ->',
         state,
         targetHeatCool,
@@ -245,11 +245,11 @@ export class EightsleepPodPlatformAccessory {
     cb: CharacteristicGetCallback<PositiveLevelsType>,
   ): Promise<void> => {
     try {
-      this.platform.log.info('Get RotationSpeed')
+      this.platform.log.debug('Get RotationSpeed')
       const side = this.accessory.context.side
       let level: Levels = await this.eightSleepPod.getLevel(side)
       level = Math.abs(level) as PositiveLevelsType
-      this.platform.log.info('Get RotationSpeed ->', level)
+      this.platform.log.debug('Get RotationSpeed ->', level)
       cb(null, level)
     } catch (err) {
       this.platform.log.error('Get RotationSpeed Error ->', err)
@@ -262,13 +262,13 @@ export class EightsleepPodPlatformAccessory {
     cb: CharacteristicSetCallback,
   ) => {
     try {
-      this.platform.log.info('Set RotationSpeed', rotationSpeed)
+      this.platform.log.debug('Set RotationSpeed', rotationSpeed)
       const side = this.accessory.context.side
       let level: Levels = (Math.round((rotationSpeed as number) / 10) *
         10) as Levels
       const factor = this.targetHeatCool === HEAT ? 1 : -1
       level = (level * factor) as Levels
-      this.platform.log.info('Set RotationSpeed ->', rotationSpeed, level)
+      this.platform.log.debug('Set RotationSpeed ->', rotationSpeed, level)
       await this.eightSleepPod.setLevel(side, level)
       cb(null, Math.abs(level))
     } catch (err) {
@@ -281,9 +281,9 @@ export class EightsleepPodPlatformAccessory {
     cb: CharacteristicGetCallback<number>,
   ): Promise<void> => {
     try {
-      this.platform.log.info('Get CurrentTemperature')
+      this.platform.log.debug('Get CurrentTemperature')
       const temp: number = await this.eightSleepPod.getTemperature()
-      this.platform.log.info('Get CurrentTemperature ->', temp)
+      this.platform.log.debug('Get CurrentTemperature ->', temp)
       cb(null, temp)
     } catch (err) {
       this.platform.log.error('Get CurrentTemperature Error ->', err)
